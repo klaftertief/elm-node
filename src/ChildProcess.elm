@@ -1,6 +1,7 @@
-module ChildProcess (..) where
+module ChildProcess (ChildProcess, exec, execWithOptions, onExit) where
 
 {-|
+@docs ChildProcess, exec, execWithOptions, onExit
 -}
 
 import Emitter.Unsafe as Emitter
@@ -14,6 +15,8 @@ import Streams.Types as Streams
 import Task exposing (Task)
 
 
+{-|
+-}
 type ChildProcess
   = ChildProcess JSRaw
 
@@ -32,16 +35,22 @@ childProcess =
   Marshall.unsafeRequire "child_process"
 
 
+{-|
+-}
 execWithOptions : Options -> String -> Task x ChildProcess
 execWithOptions options command =
   Get.getAsync2 "exec" childProcess command options
 
 
+{-|
+-}
 exec : String -> Task x ChildProcess
 exec =
   execWithOptions defaultOptions
 
 
+{-|
+-}
 onExit : ChildProcess -> (Maybe Process.ExitCode -> Task x ()) -> Task x (Task x ())
 onExit cp f =
   Emitter.on1 "exit" cp (f << Process.intToExit)
